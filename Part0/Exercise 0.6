@@ -1,0 +1,31 @@
+https://www.websequencediagrams.com/?lz=dGl0bGUgRXhlcmNpc2UgMC42Cgpicm93c2VyLT5zZXJ2ZXI6IEhUVFAgR0VUIGh0dHBzOi8vAAEHL3N0dWRpZXMuY3MuaGVsc2lua2kuZmkvZXhhbXBsZWFwcC9zcGEKAEEGLS0-AFIHOiBIVE1MLWNvZGUASSMAQiJtYWluLmNzcwBWEwASCQAkRHNwYS5qAFIUABIHCm5vdGUgb3ZlciAAgWIIAIJECCBzdGFydHMgZXhlY3V0aW5nIGpzAIF7BnRoYXQgcmVxdWVzdHMgSlNPTiBkYXRhIGZyb20gAIJ7BiAKZW5kIG5vdGUAgngkAIJyImRhdGEuanNvbgCDBxNbeyBjb250ZW50OiAiSFRNTCBpcyBlYXN5IiwgZGF0ZTogIjIwMTktMDUtMjMiIH0sIC4uLl0AgV4dAIFuBmVzIHRoZSBldmVudCBoYW5kbGVyAIF1CG5kZXJzAIFcBXMgdG8gZGlzcGxheQCBawsAKTUgd2hlbgp1c2VyIGNsaWNrAHsGc2F2ZSBidXR0b24gYW5kIHJlLQB6Bwp0aGUAgmEFIGxpc3QgaW5jbHVkaW5nAIEzBW5ldwCCfQUuAIJrIVBPUwCFESxuZXdfbm90ZV9zcGE&s=default
+
+title Exercise 0.6
+
+browser->server: HTTP GET https://https://studies.cs.helsinki.fi/exampleapp/spa
+server-->browser: HTML-code
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css
+server-->browser: main.css
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/spa.js
+server-->browser: spa.js
+
+note over browser:
+browser starts executing js-code
+that requests JSON data from server 
+end note
+
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
+server-->browser: [{ content: "HTML is easy", date: "2019-05-23" }, ...]
+
+note over browser:
+browser executes the event handler
+that renders notes to display
+end note
+
+note over browser:
+browser executes the event handler when
+user clicks the save button and re-renders
+the note list including the new note.
+end note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa

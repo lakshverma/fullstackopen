@@ -1,0 +1,54 @@
+https://www.websequencediagrams.com/?lz=dGl0bGUgRXhlcmNpc2UgMC40Cgpicm93c2VyLT5zZXJ2ZXI6IEhUVFAgR0VUIGh0dHBzOi8vc3R1ZGllcy5jcy5oZWxzaW5raS5maS9leGFtcGxlYXBwL25vdGVzCgA7Bi0tPgBMBzogSFRNTC1jb2RlACFFbWFpbi5jcwBVFAASCQAfSWoAThlqcwoKbm90ZSBvdmVyIACBZAgAgkAIIHN0YXJ0cyBleGVjdXRpbmcganMAgX0GdGhhdCByZXF1ZXN0cyBKU09OIGRhdGEgZnJvbSAAgncGIAplbmQgbm90ZQCCUkZkYXRhLmpzb24AgwkTW3sgY29udGVudDogIkhUTUwgaXMgZWFzeSIsIGRhdGU6ICIyMDE5LTA1LTIzIiB9LCAuLi5dAIFeHQCBbgZlcyB0aGUgZXZlbnQgaGFuZGxlcgCBdQhuZGVycwCBXAVzIHRvIGRpc3BsYXkAgVUhUE9TAIRiLWV3XwCCPwYAgx4KAIVXBwpEYXRhIGlzIHJlY2VpdmVkIGEAgSkGYm9keSBvZgCBNgVQT1NULQCDIwcuCgpUaGUAgxgIY3JlYXRlcyBhIG5ldwCDJAUgb2JqZWN0LCAKYW5kIGFkZACBeAYAg1UFdG8gYW4gYXJyYXkgY2FsbGUAg1YGcwCDWwsAhiISc3RhdHVzIGNvZGUgMzAyIChVUkwgcmVkaXJlY3QpAIMphAduZXdseSBhZGQAhEwHAIcoDDIxLTA4LTE4AIZNZw&s=default
+
+title Exercise 0.4
+
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/notes
+server-->browser: HTML-code
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css
+server-->browser: main.css
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.js
+server-->browser: main.js
+
+note over browser:
+browser starts executing js-code
+that requests JSON data from server 
+end note
+
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
+server-->browser: [{ content: "HTML is easy", date: "2019-05-23" }, ...]
+
+note over browser:
+browser executes the event handler
+that renders notes to display
+end note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+
+note over server:
+Data is received as the body of the POST-request.
+
+The server creates a new note object, 
+and adds the data to an array called notes
+end note
+
+server-->browser: status code 302 (URL redirect)
+
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/notes
+server-->browser: HTML-code
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css
+server-->browser: main.css
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.js
+server-->browser: main.js
+
+note over browser:
+browser starts executing js-code
+that requests JSON data from server 
+end note
+
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
+server-->browser: [{ content: "newly added note", date: "2021-08-18" }, ...]
+
+note over browser:
+browser executes the event handler
+that renders notes to display
+end note
