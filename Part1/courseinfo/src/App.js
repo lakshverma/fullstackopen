@@ -2,20 +2,26 @@ import React from 'react'
 
 const App = () => {
   const course = 'Half Stack application development'
-  const part1 = 'Fundamentals of React'
-  const exercises1 = 10
-  const part2 = 'Using props to pass data'
-  const exercises2 = 7
-  const part3 = 'State of a component'
-  const exercises3 = 14
+  const part1 = {
+    name: 'Fundamentals of React',
+    exercises: 10
+  }
+  const part2 = {
+    name: 'Using props to pass data',
+    exercises: 7
+  }
+  const part3 = {
+    name: 'State of a component',
+    exercises: 14
+  }
 
   return (
     <div>
       <Header course={course} />
-      <Content partNum={part1} exerciseNum={exercises1} />
-      <Content partNum={part2} exerciseNum={exercises2} />
-      <Content partNum={part3} exerciseNum={exercises3} />
-      <Total exerciseSum={exercises1 + exercises2 + exercises3} />
+      <Content partTitle={part1.name} exerciseNum={part1.exercises} />
+      <Content partTitle={part2.name} exerciseNum={part2.exercises} />
+      <Content partTitle={part3.name} exerciseNum={part3.exercises} />
+      <Total exerciseSum={part1.exercises + part2.exercises + part3.exercises} />
     </div>
   )
 }
@@ -35,7 +41,7 @@ const Content = (props) => {
 return (
   <div>
     <p>
-      {props.partNum} {props.exerciseNum}
+      {props.partTitle} {props.exerciseNum}
     </p>
   </div>
 )
