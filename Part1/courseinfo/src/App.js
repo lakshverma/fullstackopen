@@ -2,26 +2,26 @@ import React from 'react'
 
 const App = () => {
   const course = 'Half Stack application development'
-  const part1 = {
-    name: 'Fundamentals of React',
-    exercises: 10
-  }
-  const part2 = {
-    name: 'Using props to pass data',
-    exercises: 7
-  }
-  const part3 = {
-    name: 'State of a component',
-    exercises: 14
-  }
+  const parts = [
+    {
+      name: 'Fundamentals of React',
+      exercises: 10
+    },
+    {
+      name: 'Using props to pass data',
+      exercises: 7
+    },
+    {
+      name: 'State of a component',
+      exercises: 14
+    }
+  ]
 
   return (
     <div>
       <Header course={course} />
-      <Content partTitle={part1.name} exerciseNum={part1.exercises} />
-      <Content partTitle={part2.name} exerciseNum={part2.exercises} />
-      <Content partTitle={part3.name} exerciseNum={part3.exercises} />
-      <Total exerciseSum={part1.exercises + part2.exercises + part3.exercises} />
+      <Content parts={parts} />
+      <Total exerciseSum={parts} />
     </div>
   )
 }
@@ -41,17 +41,22 @@ const Content = (props) => {
 return (
   <div>
     <p>
-      {props.partTitle} {props.exerciseNum}
+      {props.parts[0].name} {props.parts[0].exercises}
+      <br />
+      {props.parts[1].name} {props.parts[1].exercises}
+      <br />
+      {props.parts[2].name} {props.parts[2].exercises}
     </p>
   </div>
 )
 }
 
 const Total = (props) => {
+  console.log(props)
   return (
     <div>
       <p>
-        Number of exercises {props.exerciseSum}
+        Number of exercises {props.exerciseSum[0].exercises + props.exerciseSum[1].exercises + props.exerciseSum[2].exercises}
       </p>
     </div>
   )
