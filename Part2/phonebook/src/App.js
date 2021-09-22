@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios'
+import peopleService from "./services/people";
 
 const Filter = ({ inputControlState, changeHandler }) => {
   return (
@@ -27,58 +27,82 @@ const PersonForm = ({ submitHandler, inputControlState, changeHandler }) => {
   );
 };
 
-const People = ({ persons, personsState }) => {
+const People = ({ people, peopleState, handleDeleteContact }) => {
   // Filters out contacts based on the user input controlled by newFilter state
-  const peopleToShow = persons.filter((person) =>
-    person.name.toLowerCase().includes(personsState.toLowerCase())
+  const peopleToShow = people.filter((person) =>
+    person.name.toLowerCase().includes(peopleState.toLowerCase())
   );
 
   return (
     <ul>
       {peopleToShow.map((person) => (
         <li key={person.id}>
-          {person.name} {person.number}
+          {person.name} {person.number} <DeleteContact id={person.id} handleDeleteContact={handleDeleteContact} contactName={person.name} />
         </li>
       ))}
     </ul>
   );
 };
 
+const DeleteContact = ({id, handleDeleteContact, contactName}) => {
+  return (
+    <button onClick={() => handleDeleteContact(id, contactName)}>delete</button>
+  )
+}
+
 const App = () => {
-  const [persons, setPersons] = useState([]);
+  const [people, setPeople] = useState([]);
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
 
   useEffect(() => {
-    console.log('effect')
-    axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
-    })
+    peopleService
+      .getAll()
+      .then(initialPeople => {
+        setPeople(initialPeople)
+      })
   }, [])
   
-  console.log('render', persons.length, 'persons')
+  // console.log('render', people.length, 'people')
 
   const addContact = (e) => {
     e.preventDefault();
+    const existingPerson = people.find((o) => (o.name === newName && o.number === newNumber))
+    const sameNamePerson = people.find((o) => (o.name === newName))
 
-    if (persons.find((o) => o.name === newName)) {
+    if (existingPerson) {
       alert(`${newName} is already added to phonebook`);
+    } else if (sameNamePerson) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedPerson = {...sameNamePerson, number: newNumber}
+        peopleService
+          .update(updatedPerson.id, updatedPerson)
+          .then(response => {
+            console.log('axios response:', response.data)
+            // Update the state to show the updated contact details on the frontend.
+            // If person id from state matches updated contact id, use the data from backend instead of
+            // the person state from frontend
+            setPeople(people.map(person => (person.id !== updatedPerson.id)  ? person : response.data))
+            setNewName("");
+            setNewNumber("");
+          })
+      }
     } else {
       const contactObject = {
         name: newName,
         number: newNumber,
         date: new Date().toISOString(),
-        id: persons.length + 1,
       };
 
-      setPersons(persons.concat(contactObject));
-      setNewName("");
-      setNewNumber("");
+      peopleService
+        .create(contactObject)
+        .then(returnedContact => {
+          setPeople(people.concat(returnedContact))
+          setNewName("");
+          setNewNumber("");
+        })
     }
   };
 
@@ -95,6 +119,15 @@ const App = () => {
     setNewFilter(e.target.value);
   };
 
+  const handleDeleteContact = (id, contactName) => {
+    if (window.confirm(`Delete ${contactName}?`)) {
+      peopleService
+        .deleteContact(id)
+      // Update the state to filter out the deleted contact from the Frontend
+      setPeople(people.filter(person => person.id !== id))
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -108,7 +141,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <People persons={persons} personsState={newFilter} />
+      <People people={people} peopleState={newFilter} handleDeleteContact={handleDeleteContact} />
     </div>
   );
 };
