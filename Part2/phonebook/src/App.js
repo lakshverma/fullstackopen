@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import peopleService from "./services/people";
 
+const Notification = ({ message, notificationType }) => {
+  if (message === null) {
+    return null;
+  }
+
+  if (notificationType === "success") {
+    return <div className="success">{message}</div>;
+  }
+
+  return <div className="error">{message}</div>;
+};
+
 const Filter = ({ inputControlState, changeHandler }) => {
   return (
     <div>
@@ -37,18 +49,23 @@ const People = ({ people, peopleState, handleDeleteContact }) => {
     <ul>
       {peopleToShow.map((person) => (
         <li key={person.id}>
-          {person.name} {person.number} <DeleteContact id={person.id} handleDeleteContact={handleDeleteContact} contactName={person.name} />
+          {person.name} {person.number}{" "}
+          <DeleteContact
+            id={person.id}
+            handleDeleteContact={handleDeleteContact}
+            contactName={person.name}
+          />
         </li>
       ))}
     </ul>
   );
 };
 
-const DeleteContact = ({id, handleDeleteContact, contactName}) => {
+const DeleteContact = ({ id, handleDeleteContact, contactName }) => {
   return (
     <button onClick={() => handleDeleteContact(id, contactName)}>delete</button>
-  )
-}
+  );
+};
 
 const App = () => {
   const [people, setPeople] = useState([]);
@@ -56,38 +73,68 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationType, setNotificationType] = useState(null);
 
   useEffect(() => {
-    peopleService
-      .getAll()
-      .then(initialPeople => {
-        setPeople(initialPeople)
-      })
-  }, [])
-  
+    peopleService.getAll().then((initialPeople) => {
+      setPeople(initialPeople);
+    });
+  }, []);
+
   // console.log('render', people.length, 'people')
 
   const addContact = (e) => {
     e.preventDefault();
-    const existingPerson = people.find((o) => (o.name === newName && o.number === newNumber))
-    const sameNamePerson = people.find((o) => (o.name === newName))
+    const existingPerson = people.find(
+      (o) => o.name === newName && o.number === newNumber
+    );
+    const sameNamePerson = people.find((o) => o.name === newName);
 
     if (existingPerson) {
       alert(`${newName} is already added to phonebook`);
     } else if (sameNamePerson) {
-      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        const updatedPerson = {...sameNamePerson, number: newNumber}
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const updatedPerson = { ...sameNamePerson, number: newNumber };
         peopleService
           .update(updatedPerson.id, updatedPerson)
-          .then(response => {
-            console.log('axios response:', response.data)
+          .then((response) => {
+            console.log("axios response:", response.data);
             // Update the state to show the updated contact details on the frontend.
             // If person id from state matches updated contact id, use the data from backend instead of
             // the person state from frontend
-            setPeople(people.map(person => (person.id !== updatedPerson.id)  ? person : response.data))
+            setPeople(
+              people.map((person) =>
+                person.id !== updatedPerson.id ? person : response.data
+              )
+            );
+            setNotificationType("success");
+
+            setNotificationMessage(
+              `${updatedPerson.name}'s details have been successfully updated.`
+            );
+            setTimeout(() => {
+              setNotificationMessage(null);
+              setNotificationType(null);
+            }, 5000);
             setNewName("");
             setNewNumber("");
           })
+          .catch(error => {
+            setNotificationType("error");
+            setNotificationMessage(
+              `Error ${error.response.status}: ${updatedPerson.name} has already been deleted from the server.`
+            );
+            setTimeout(() => {
+              setNotificationMessage(null);
+              setNotificationType(null);
+            }, 5000);
+            console.log(error);
+          });
       }
     } else {
       const contactObject = {
@@ -96,13 +143,20 @@ const App = () => {
         date: new Date().toISOString(),
       };
 
-      peopleService
-        .create(contactObject)
-        .then(returnedContact => {
-          setPeople(people.concat(returnedContact))
-          setNewName("");
-          setNewNumber("");
-        })
+      peopleService.create(contactObject).then((returnedContact) => {
+        setPeople(people.concat(returnedContact));
+        setNewName("");
+        setNewNumber("");
+
+        setNotificationMessage(
+          `${contactObject.name} has been successfully added to the phonebook.`
+        );
+        setNotificationType("success");
+        setTimeout(() => {
+          setNotificationMessage(null);
+          setNotificationType(null);
+        }, 5000);
+      });
     }
   };
 
@@ -121,15 +175,15 @@ const App = () => {
 
   const handleDeleteContact = (id, contactName) => {
     if (window.confirm(`Delete ${contactName}?`)) {
-      peopleService
-        .deleteContact(id)
+      peopleService.deleteContact(id);
       // Update the state to filter out the deleted contact from the Frontend
-      setPeople(people.filter(person => person.id !== id))
+      setPeople(people.filter((person) => person.id !== id));
     }
   };
 
   return (
     <div>
+      <Notification message={notificationMessage} notificationType={notificationType} />
       <h2>Phonebook</h2>
       <Filter inputControlState={newFilter} changeHandler={handleFilter} />
 
@@ -141,7 +195,11 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <People people={people} peopleState={newFilter} handleDeleteContact={handleDeleteContact} />
+      <People
+        people={people}
+        peopleState={newFilter}
+        handleDeleteContact={handleDeleteContact}
+      />
     </div>
   );
 };
