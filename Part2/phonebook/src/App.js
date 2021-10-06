@@ -1,55 +1,61 @@
-import React, { useState, useEffect } from "react";
-import peopleService from "./services/people";
+/* eslint-disable react/jsx-filename-extension */
+/* eslint-disable react/prop-types */
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
+import React, { useState, useEffect } from 'react';
+import peopleService from './services/people';
 
 const Notification = ({ message, notificationType }) => {
   if (message === null) {
     return null;
   }
 
-  if (notificationType === "success") {
+  if (notificationType === 'success') {
     return <div className="success">{message}</div>;
   }
 
   return <div className="error">{message}</div>;
 };
 
-const Filter = ({ inputControlState, changeHandler }) => {
-  return (
-    <div>
-      filter shown with:{" "}
-      <input value={inputControlState} onChange={changeHandler} />
-    </div>
-  );
-};
+const Filter = ({ inputControlState, changeHandler }) => (
+  <div>
+    filter shown with:
+    {' '}
+    <input value={inputControlState} onChange={changeHandler} />
+  </div>
+);
 
-const PersonForm = ({ submitHandler, inputControlState, changeHandler }) => {
-  return (
-    <form onSubmit={submitHandler}>
-      <div>
-        name: <input value={inputControlState[0]} onChange={changeHandler[0]} />
-      </div>
-      <div>
-        number:{" "}
-        <input value={inputControlState[1]} onChange={changeHandler[1]} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  );
-};
+const PersonForm = ({ submitHandler, inputControlState, changeHandler }) => (
+  <form onSubmit={submitHandler}>
+    <div>
+      name:
+      {' '}
+      <input value={inputControlState[0]} onChange={changeHandler[0]} />
+    </div>
+    <div>
+      number:
+      {' '}
+      <input value={inputControlState[1]} onChange={changeHandler[1]} />
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+);
 
 const People = ({ people, peopleState, handleDeleteContact }) => {
   // Filters out contacts based on the user input controlled by newFilter state
-  const peopleToShow = people.filter((person) =>
-    person.name.toLowerCase().includes(peopleState.toLowerCase())
-  );
+  const peopleToShow = people.filter((person) => (
+    person.name.toLowerCase().includes(peopleState.toLowerCase())));
 
   return (
     <ul>
       {peopleToShow.map((person) => (
         <li key={person.id}>
-          {person.name} {person.number}{" "}
+          {person.name}
+          {' '}
+          {person.number}
+          {' '}
           <DeleteContact
             id={person.id}
             handleDeleteContact={handleDeleteContact}
@@ -61,18 +67,16 @@ const People = ({ people, peopleState, handleDeleteContact }) => {
   );
 };
 
-const DeleteContact = ({ id, handleDeleteContact, contactName }) => {
-  return (
-    <button onClick={() => handleDeleteContact(id, contactName)}>delete</button>
-  );
-};
+const DeleteContact = ({ id, handleDeleteContact, contactName }) => (
+  <button type="button" onClick={() => handleDeleteContact(id, contactName)}>delete</button>
+);
 
 const App = () => {
   const [people, setPeople] = useState([]);
 
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [newFilter, setNewFilter] = useState("");
+  const [newName, setNewName] = useState('');
+  const [newNumber, setNewNumber] = useState('');
+  const [newFilter, setNewFilter] = useState('');
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationType, setNotificationType] = useState(null);
 
@@ -87,53 +91,57 @@ const App = () => {
   const addContact = (e) => {
     e.preventDefault();
     const existingPerson = people.find(
-      (o) => o.name === newName && o.number === newNumber
+      (o) => o.name === newName && o.number === newNumber,
     );
     const sameNamePerson = people.find((o) => o.name === newName);
 
     if (existingPerson) {
+      // eslint-disable-next-line no-undef
       alert(`${newName} is already added to phonebook`);
     } else if (sameNamePerson) {
       if (
+        // eslint-disable-next-line no-undef
         window.confirm(
-          `${newName} is already added to phonebook, replace the old number with a new one?`
+          `${newName} is already added to phonebook, replace the old number with a new one?`,
         )
       ) {
         const updatedPerson = { ...sameNamePerson, number: newNumber };
         peopleService
           .update(updatedPerson.id, updatedPerson)
           .then((response) => {
-            console.log("axios response:", response.data);
+            console.log('axios response:', response.data);
             // Update the state to show the updated contact details on the frontend.
-            // If person id from state matches updated contact id, use the data from backend instead of
-            // the person state from frontend
+            // If person id from state matches updated contact id, use the data from backend instead
+            // of the person state from frontend
             setPeople(
-              people.map((person) =>
-                person.id !== updatedPerson.id ? person : response.data
-              )
+              people.map((person) => (person.id !== updatedPerson.id ? person : response.data)),
             );
-            setNotificationType("success");
+            setNotificationType('success');
 
             setNotificationMessage(
-              `${updatedPerson.name}'s details have been successfully updated.`
+              `${updatedPerson.name}'s details have been successfully updated.`,
             );
             setTimeout(() => {
               setNotificationMessage(null);
               setNotificationType(null);
             }, 5000);
-            setNewName("");
-            setNewNumber("");
+            setNewName('');
+            setNewNumber('');
           })
-          .catch(error => {
-            setNotificationType("error");
+          .catch((error) => {
+            setNotificationType('error');
             setNotificationMessage(
-              `Error ${error.response.status}: ${updatedPerson.name} has already been deleted from the server.`
+              `Error ${error.response.status}: ${error.response.data.error}`,
             );
             setTimeout(() => {
               setNotificationMessage(null);
               setNotificationType(null);
             }, 5000);
-            console.log(error);
+            // To handle an edge case where there is an attempt to update the
+            // contact but the contact is deleted before the put request could be sent.
+            if (error.response.status === 404) {
+              setPeople(people.filter((person) => person.id !== updatedPerson.id));
+            }
           });
       }
     } else {
@@ -143,20 +151,31 @@ const App = () => {
         date: new Date().toISOString(),
       };
 
-      peopleService.create(contactObject).then((returnedContact) => {
-        setPeople(people.concat(returnedContact));
-        setNewName("");
-        setNewNumber("");
+      peopleService.create(contactObject)
+        .then((returnedContact) => {
+          setPeople(people.concat(returnedContact));
+          setNewName('');
+          setNewNumber('');
 
-        setNotificationMessage(
-          `${contactObject.name} has been successfully added to the phonebook.`
-        );
-        setNotificationType("success");
-        setTimeout(() => {
-          setNotificationMessage(null);
-          setNotificationType(null);
-        }, 5000);
-      });
+          setNotificationMessage(
+            `${contactObject.name} has been successfully added to the phonebook.`,
+          );
+          setNotificationType('success');
+          setTimeout(() => {
+            setNotificationMessage(null);
+            setNotificationType(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          setNotificationMessage(
+            error.response.data.error,
+          );
+          setNotificationType('error');
+          setTimeout(() => {
+            setNotificationMessage(null);
+            setNotificationType(null);
+          }, 5000);
+        });
     }
   };
 
@@ -165,7 +184,7 @@ const App = () => {
   };
 
   const handleNumChange = (e) => {
-    console.log(newNumber);
+    // console.log(newNumber);
     setNewNumber(e.target.value);
   };
 
@@ -174,6 +193,7 @@ const App = () => {
   };
 
   const handleDeleteContact = (id, contactName) => {
+    // eslint-disable-next-line no-undef
     if (window.confirm(`Delete ${contactName}?`)) {
       peopleService.deleteContact(id);
       // Update the state to filter out the deleted contact from the Frontend
