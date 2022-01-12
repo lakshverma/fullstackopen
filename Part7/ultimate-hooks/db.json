@@ -1,0 +1,59 @@
+{
+  "notes": [
+    {
+      "content": "custom-hooks are grat",
+      "id": 1
+    },
+    {
+      "content": "the best featrure ever <3",
+      "id": 2
+    },
+    {
+      "content": "lalalala",
+      "id": 3
+    },
+    {
+      "content": "lalalala",
+      "id": 4
+    },
+    {
+      "content": "mango zara masimo dutti",
+      "id": 5
+    },
+    {
+      "content": "tom ford amouage nishane",
+      "id": 6
+    },
+    {
+      "content": "gyigg",
+      "id": 7
+    }
+  ],
+  "persons": [
+    {
+      "name": "mluukkai",
+      "number": "040-5483923",
+      "id": 1
+    },
+    {
+      "name": "kaltsoon",
+      "number": "045-2323456",
+      "id": 2
+    },
+    {
+      "name": "Lakshay",
+      "number": "9955555555",
+      "id": 3
+    },
+    {
+      "name": "Bentley Intense Man",
+      "number": "99999555555",
+      "id": 4
+    },
+    {
+      "name": "gigigigigg",
+      "number": "5757575757",
+      "id": 5
+    }
+  ]
+}
